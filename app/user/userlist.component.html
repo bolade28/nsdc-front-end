@@ -1,0 +1,24 @@
+<div class="container">
+  <h2>NSDC User List</h2>
+  <p>The .table-bordered class adds border on all sides of the table and cells:</p>                        
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>UserName</th>
+        <th>Firstname</th>
+        <th>Lastname</th>
+        <th>Email</th>
+        <th>Status</th>                        
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td><a href="#" [routerLink]="['/users', user.id]" routerLinkActive="active">{{user.username}}</a></td>
+        <td>{{user.firstname}}</td>
+        <td>{{user.lastname}}</td>
+        <td>{{user.email}}</td> 
+        <td>{{user.status}}</td>               
+      </tr>
+    </tbody>
+  </table>
+</div>
