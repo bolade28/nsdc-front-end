@@ -27,23 +27,23 @@ class Serializer(object):
         return [m.serialize() for m in l]
 
 role_permission = db.Table('role_permission',
-    db.Column('role_id', db.Integer, db.ForeignKey('role.id'), nullable=False),
-    db.Column('permission_id', db.Integer, db.ForeignKey('permission.id'), nullable=False)
-    db.PrimaryKeyConstraint('role_id', 'permission_id')
+    db.Column('role_id', db.Integer, db.ForeignKey('role.role_id'), nullable=False),
+    db.Column('permission_id', db.Integer, db.ForeignKey('permission.permission_id'), nullable=False)
+    # db.PrimaryKeyConstraint('role_id', 'permission_id')
 )
 
 class RolePermissions():
     __tablename__ = 'role_permission'
     id = db.Column(db.Integer, primary_key=True)
-    role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
-    permission_id = db.Column(db.Integer, db.ForeignKey('permission.id'))
+    role_id = db.Column(db.Integer, db.ForeignKey('role.role_id'))
+    permission_id = db.Column(db.Integer, db.ForeignKey('permission.permission_id'))
 
 
     def __init__(self,role_id,permission_id):
       self.role_id=role_id
       self.permission_id=permission_id
 
-db.mapper(RolePermissions, role_permission)
+# db.mapper(RolePermissions, role_permission)
 
 class Role(db.Model, Serializer):
     __tablename__ = "role"
@@ -61,14 +61,18 @@ class Role(db.Model, Serializer):
         self.role_name = role_name
 
     def serialize(self):
-        role_data = Serializer.serialize(self)
-        return role_data
+        return {
+            'role_name' : self.role_name,
+            'role_desc' : self.role_desc,
+            'users' : self.users,
+            'permissions' : self.permissions
+        }
 
 
 class User(db.Model, Serializer):
     __tablename__ = "user"
     id = db.Column('id', db.Integer, primary_key=True)
-    role_id = db.Column('role_id', db.Integer, db.ForeignKey(Role.id))
+    # role_id = db.Column('role_id', db.Integer, db.ForeignKey(Role.id))
     firstname = db.Column('firstname', db.String(50), nullable=False, server_default=u'')
     lastname = db.Column('lastname', db.String(50), server_default=u'')
     email = db.Column('email', db.Unicode(255), server_default=u'', nullable=False, unique=True)
@@ -76,7 +80,7 @@ class User(db.Model, Serializer):
     password = db.Column('password', db.Unicode(255), nullable=False, server_default='')
     created_at = db.Column('user_creationDate', db.TIMESTAMP,
                            server_default=db.func.current_timestamp(),nullable=False)
-    role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
+    role_id = db.Column(db.Integer, db.ForeignKey('role.role_id'))
 
     def __init__(self, role_id, firstname, lastname, email, username, password):
         self.role_id = role_id
@@ -99,12 +103,12 @@ class User(db.Model, Serializer):
 class Permission(db.Model, Serializer):
     __tablename__ = "permission"
     id = db.Column('permission_id', db.Integer, primary_key=True)
-    role_id = db.Column('role_id', db.Integer, db.ForeignKey(Role.id))
+    # role_id = db.Column('role_id', db.Integer, db.ForeignKey(Role.id))
     permission_name = db.Column('permission_name', db.Unicode(255), )
     permission_desc = db.Column('permission_desc', db.Unicode(255), )
     created_at = db.Column('perm_creationDate', db.TIMESTAMP,
                            server_default=db.func.current_timestamp(),nullable=False)
-    role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
+    role_id = db.Column(db.Integer, db.ForeignKey('role.role_id'))
 
     def __init__(self, role_id, permission_name, permission_desc):
         self.role_id = role_id
